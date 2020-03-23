@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+    <title>学生信息管理系统</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+	<link href="/easyui/themes/default/easyui.css" rel="stylesheet">
+    <link href="/easyui/themes/icon.css" rel="stylesheet">
+
+    <script src="/easyui/jquery.min.js"></script>
+    <script src="/easyui/jquery.easyui.min.js"></script>
+	<script src="/easyui/locale/easyui-lang-zh_CN.js"></script>
+
+</head>
+<body class="easyui-layout">
+<!---模态对话框-->
+<div id="dd">
+    <form id="ff" method="post">
+        <div>
+            <label>二级学院名：</label>
+            <input class="easyui-validatebox" type="text" name="name" data-options="required:true" id="name" />
+        </div>
+        <button type="submit" class="btn btn-default" onclick="add()">确定</button>
+    </form>
+</div>
+
+<div id="dd_edit">
+    <form id="ff_edit" method="post">
+        <div>
+            <label>二级学院名：</label>
+            <input class="easyui-textbox" type="text" name="name" data-options="required:true" id="name_eidt" />
+        </div>
+        <button type="submit" class="btn btn-default" onclick="edit()">确定</button>
+    </form>
+</div>
+<!-- 工具栏 -->
+<div data-options="region:'north',border:true,title:''">
+    <div style="padding:2px;float:left;height:26px;">
+        <a href="javascript:void(0)" id="addUser" class="easyui-linkbutton" iconCls="icon-add"  onclick="addFaculty();">添加学院</a>
+        <a href="javascript:void(0)" id="deleteUser" class="easyui-linkbutton" iconCls="icon-cancel"  onclick="deleteFaculty();">删除学院</a>
+        <a href="javascript:void(0)" id="editUser" class="easyui-linkbutton" iconCls="icon-edit"  onclick="editFaculty()">修改学院</a>
+        <a href="javascript:void(0)" id="detailUser" class="easyui-linkbutton" iconCls="icon-details"  onclick="detailFaculty();">查看学院</a>
+    </div>
+</div>
+
+    <!-- 数据面板 -->
+    <div data-options="region:'center',border:true,fit:false" style="padding-right:5px;">
+        <table id='FacultyInfo' style='width:100%;'>
+        	<thead>
+        		<tr>
+        			<th field='id' hidden='ture'>ID</th>
+        			<th data-options="field:'ck',checkbox:true"></th>
+        			<th field='name' >班级名称</th>
+        		</tr>
+        	</thead>
+        </table>
+
+    </div>
+
+    <!-- 查询面板 -->
+    <div data-options="region:'west',collapsed:true,split:true,title:'查询面板'" style="width:380px;">
+        <div id="tb" style="padding:30px">
+            <span>Name:</span>
+            <input id="name_search" style="line-height:26px;border:10px solid #ccc">
+            <a href="#" class="easyui-linkbutton" plain="true" onclick="doSearch()">Search</a>
+        </div>
+    </div>
+
+    <script type="text/javascript">
+        var faculty;
+        function edit() {
+            var id= $('#FacultyInfo').datagrid('getSelected').id;
+            var name =$("#name_eidt").textbox("getValue");
+            console.log(id);
+            $.ajax({
+                //几个参数需要注意一下
+                type: "POST",//方法类型
+                dataType: "json",//预期服务器返回的数据类型
+                url: "http://106.13.79.146:10000/faculty/update" ,//url
+                data: {id:id,name:name},
+
+                success: function (data) {
+                    if (data.success) {
+                        $("#FacultyInfo").datagrid("reload");
+                    } else {
+                        alert(data.msg);
+                    }
+                }
+            });
+        }
+
+        function add() {
+            $.ajax({
+                //几个参数需要注意一下
+                type: "POST",//方法类型
+                dataType: "json",//预期服务器返回的数据类型
+                url: "http://106.13.79.146:10000/faculty/add" ,//url
+                data: {id:0,name:$("#name").val()},
+
+                success: function (data) {
+                    console.log(data);
+                    if (data.success) {
+                        $("#FacultyInfo").datagrid("reload");
+                        console.log($('#name').val);
+                    } else {
+                        alert(data.msg);
+                    }
+                }
+            });
+        }
+
+        function doSearch() {
+            $('#FacultyInfo').datagrid('load',{
+                name: $("#name_search").val()
+            });
+        }
+
+        function addFaculty(){
+            $('#dd').dialog({
+                title: '添加二级学院',
+                closed: false,
+                cache: false,
+                modal: true
+            });
+
+            //$('#dd').dialog('refresh', 'new_content.php');
+        }
+
+        function deleteFaculty(){
+            var row = $('#FacultyInfo').datagrid('getSelected');
+
+            if (row){
+                $.messager.confirm('确认对话框', '是否删除？', function (r) {
+                    var that = this;
+                    if (r) {
+                        $.ajax({
+                            type: "post",
+                            url: "http://106.13.79.146:10000/faculty/delete",
+                            data: {id: row.id},
+                            dataType: "json",
+                            success: function (data) {
+                                console.log(data);
+                                if (data.success) {
+                                    $("#FacultyInfo").datagrid("reload");
+                                } else {
+                                    alert(data.msg);
+                                }
+                            }
+                        });
+                    }
+                });
+            }else{
+                alert("请先选中某行！","info");
+            }
+        }
+
+        function editFaculty(){
+
+            var row = $('#FacultyInfo').datagrid('getSelected');
+            $("#name_eidt").textbox("setValue",row.name);
+
+            console.log($("#name_eidt").textbox("getValue"));
+            $('#dd_edit').dialog({
+                title: '修改二级学院名',
+                closed: false,
+                cache: false,
+                modal: true
+            });
+
+        }
+
+        function detailFaculty(){
+        }
+
+        window.onload=function () {
+            $('#FacultyInfo').datagrid({loadFilter:pagerFilter});
+        }
+
+    </script>
+    <script>
+        $(function () {
+            $('#FacultyInfo').datagrid( {
+                fitColumns: true,//设置为 true，则会自动扩大或缩小列的尺寸以适应网格的宽度并且防止水平滚动。
+                rownumbers: true,//设置为 true，则显示带有行号的列
+                pagination: true,//设置为 true，则在数据网格（datagrid）底部显示分页工具栏。
+                striped: true,//设置为 true，则把行条纹化。（即奇偶行使用不同背景色）
+                singleSelect: true,//设置为 true，则只允许选中一行
+                idField: 'Id',//指示哪个字段是标识字段。
+                fit:true,//分页栏固定在屏幕底部
+                loadMsg: '数据加载中，请稍候...',
+                url: 'http://106.13.79.146:10000/faculty/list',
+                pageSize: 10,//当设置了 pagination 属性时，初始化页面尺寸。
+                pageList: [5,10,25,50,100,200],//当设置了 pagination 属性时，初始化页面尺寸的选择列表。
+                title: '二级学院信息',
+                queryParams: {}//当请求远程数据时，发送的额外参数。
+            });
+            $('#FacultyInfo').datagrid({loadFilter:pagerFilter});
+        });
+
+        function pagerFilter(data){
+            if (typeof data.length == 'number' && typeof data.splice == 'function'){    // 判断数据是否是数组
+                data = {
+                    total: data.length,
+                    rows: data
+                }
+            }
+            var dg = $(this);
+            var opts = dg.datagrid('options');
+            var pager = dg.datagrid('getPager');
+            pager.pagination({
+                onSelectPage:function(pageNum, pageSize){
+                    opts.pageNumber = pageNum;
+                    opts.pageSize = pageSize;
+                    pager.pagination('refresh',{
+                        pageNumber:pageNum,
+                        pageSize:pageSize
+                    });
+                    dg.datagrid('loadData',data);
+                }
+            });
+            if (!data.originalRows){
+                data.originalRows = (data.rows);
+            }
+            var start = (opts.pageNumber-1)*parseInt(opts.pageSize);
+            var end = start + parseInt(opts.pageSize);
+            data.rows = (data.originalRows.slice(start, end));
+            return data;
+        }
+    </script>
+
+</body>
+</html>

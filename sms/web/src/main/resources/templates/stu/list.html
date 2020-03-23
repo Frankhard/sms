@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<!--stu-->
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <!-- 代码告诉IE浏览器，IE8/9及以后的版本都会以最高版本IE来渲染页面 -->
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <!-- device-width确保网页能正确呈现在不同设备 -->
+    <!-- initial-scale=1确保网页加载时，以 1:1 的比例呈现，不会有任何的缩放 -->
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- 上述3个meta标签*必须*放在最前面，任何其他内容都*必须*跟随其后！ -->
+    <title>学生信息管理系统</title>
+    <!-- Bootstrap 核心 CSS 文件 -->
+    <link rel="stylesheet" href="/bootstrap-3.3.7/css/bootstrap.min.css" >
+    <!-- jQuery (Bootstrap 的所有 JavaScript 插件都依赖 jQuery，所以必须放在前边) -->
+    <script src="/bootstrap-3.3.7/js/jquery-3.3.1.min.js"></script>
+    <!-- 最新的 Bootstrap 核心 JavaScript 文件 -->
+    <script src="/bootstrap-3.3.7/js/bootstrap.min.js"></script>
+	<!--  Vue文件-->
+	<script src="/vue/vue.js"></script>
+</head>
+<body>
+<div id ="app">
+    <nav class="navbar navbar-default">
+        <div class="container">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand" href="/stu/list">学生信息管理系统</a>
+            </div>
+            <div id="navbar" class="navbar-collapse collapse">
+                <ul class="nav navbar-nav">
+                    <li><a href="/stu/list">首页</a></li>
+                    <li><a href="#">关于我们</a></li>
+                    <li class="dropdown active">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">学生管理<span class="caret"></span></a>
+                        <ul class="dropdown-menu">
+                            <li><a href="#" @click="getStudentInfos">学生列表</a></li>
+                            <li><a href="#" @click="edit">添加学生</a></li>
+                        </ul>
+                    </li>
+                    <li class="dropdown">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">用户管理<span class="caret"></span></a>
+                        <ul class="dropdown-menu">
+                            <li><a href="#" @click="logout">注销</a></li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+
+    
+
+    <div class="container">
+        <table class="table table-bordered table-hover">
+            <tr>
+                <th>学生编号</th>
+                <th>学生姓名</th>
+                <th>学号</th>
+                <th>移动电话</th>
+                <th>邮箱地址</th>
+                <th>学生年龄</th>
+                <th>学生住址</th>
+                <th>学生性别</th>
+                <th>学生班级</th>
+                <th>创建教师编号</th>
+                <th>学生状态</th>
+                <th>操作</th>
+            </tr>
+            <tr v-for="s in students">
+                <td width="5%">{{s.id}}</td>
+                <td >{{s.name}}</td>
+                <td>{{s.no}}</td>
+                <td>{{s.moblie}}</td>
+                <td>{{s.email}}</td>
+                <td>{{s.age}}</td>
+                <td>{{s.address}}</td>
+                <td>{{s.sex}}</td>
+                <td>{{s.classId}}</td>
+                <td>{{s.createUesrId}}</td>
+                <td>{{s.status}}</td>
+                <td width="15%">
+                    <button type="button" class="btn btn-primary" @click="edit(s)">修改</button>
+                    <button type="button" class="btn btn-primary" @click="deleteStuentinfo(s.id)">删除</button>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+
+    <div class="modal fade" id="edit" tabindex="-1" role="dialog">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal"
+                        aria-hidden="true">&times;</button>
+                        <h4 class="modal-title">学生信息</h4>
+                    </div>
+                    <div class="modal-body">
+                        <label>学生姓名</label>
+                        <input type="text" id="name" class="form-control"
+                         placeholder="请输入学生姓名" v-model="student.name">
+                        <label>学号</label>
+                        <input type="text" id="no" class="form-control"
+                               placeholder="请输入学号" v-model="student.no">
+                        <label>登录密码</label>
+                        <input type="password" id="pwd" class="form-control"
+                               placeholder="请输入登录密码" v-model="student.password">
+                        <label>移动电话</label>
+                        <input type="number" id="moblie" class="form-control"
+                               placeholder="请输入移动电话" v-model="student.moblie">
+                        <label>邮箱地址</label>
+                        <input type="text" id="email" class="form-control"
+                               placeholder="请输入邮箱地址" v-model="student.email">
+                        <label>学生年龄</label>
+                        <input type="number" id="age" class="form-control"
+                               placeholder="请输入学生年龄" v-model="student.age">
+                        <label>学生住址</label>
+                        <input type="text" id="address" class="form-control"
+                               placeholder="请输入学生住址" v-model="student.address">
+                        <label>学生性别</label>
+                        <input type="text" id="sex" class="form-control"
+                               placeholder="请输入学生性别" v-model="student.sex">
+                        <label>学生班级</label>
+                        <input type="number" id="classId" class="form-control"
+                               placeholder="请输入学生班级" v-model="student.classId">
+                        <label>学生状态</label>
+                        <input type="text" id="status" class="form-control"
+                               placeholder="请输入学生状态" value="未注册" v-model="student.status">
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">关闭
+                        </button>
+                        <button type="button" class="btn btn-primary" @click="doedit">提交</button>
+                    </div>
+                </div>
+            </div>
+    </div>
+
+</div>
+</body>
+	<script>
+        Date.prototype.format = function (format) {
+            var o = {
+                "M+": this.getMonth() + 1, //month
+                "d+": this.getDate(), //day
+                "h+": this.getHours(), //hour
+                "m+": this.getMinutes(), //minute
+                "s+": this.getSeconds(), //second
+                "q+": Math.floor((this.getMonth() + 3) / 3), //quarter
+                "S": this.getMilliseconds() //millisecond
+            }
+            if (/(y+)/i.test(format)) {
+                format = format.replace(RegExp.$1, (this.getFullYear() + "").substr(4 - RegExp.$1.length));
+            }
+            for (var k in o) {
+                if (new RegExp("(" + k + ")").test(format)) {
+                    format = format.replace(RegExp.$1, RegExp.$1.length == 1 ? o[k] : ("00" + o[k]).substr(("" + o[k]).length));
+                }
+            }
+            return format;
+        }
+        function renderTime(date) {
+            var dateee = new Date(date).toJSON();
+            return new Date(+new Date(dateee) + 8 * 3600 * 1000).toISOString().replace(/T/g, ' ').replace(/\.[\d]{3}Z/, '');
+        }
+		var data= {
+				students:[{
+                    id: 1, name: '', no: '',password:'',
+                    moblie: '', email: '',age:'',address:'',
+                    sex: '', classId:'',createUserId: '',
+                    createTime: '', modifyTime: '', status: ''
+                },
+                    {
+                        id: 2, name: '', no: '',password:'',
+                        moblie: '', email: '',age:'',address:'',
+                        sex: '', classId:'',createUserId: '',
+                        createTime: '', modifyTime: '', status: ''
+                    }
+                      ],
+                student:{
+                    id: 0, name: '', no: '',password:'',
+                    moblie: '', email: '',age:'',address:'',
+                    sex: '', classId:'',createUserId: '',
+                    createTime: '', modifyTime: '', status: '未注册'
+                }
+		};
+
+		new Vue({
+			el:'#app',
+			data:data,
+			mounted:function(){
+			    var that=this;
+                var token=window.sessionStorage.getItem("token");
+                if(token!=null){
+                    $.ajax({
+                        type:"post",
+                        url:"http://106.13.79.146:10000/stu/checkToken",
+                        dataType:"json",
+                        data:{token:token},
+                        success:function (data) {
+                            if (data.success) {
+                                that.getStudentInfos();
+                            }
+                            else {
+                                alert("登陆过期，请登录后重试！")
+                                window.location.href="login"
+                            }
+
+                        }
+                    });
+                }
+                else {
+                    alert("您还没有登录，请登录后重试！")
+                    window.location.href="login"
+                }
+			},
+			methods:{
+				getStudentInfos:function(){
+					var that= this;
+					$.ajax({
+						type:"post",
+						url:"http://106.13.79.146:10000/stu/list",
+						dataType:"json",
+						success:function(data){
+							that.students=[];
+							for(let index in data){
+								that.students.push(data[index]);
+							}
+						}
+					});
+				},
+				edit:function(obj){
+                    $('#edit').modal('show');
+                    this.student=obj;
+                },
+                doedit:function(){
+                    if(this.student.id>0){
+                        this.student.createTime=new Date(this.student.createTime);
+                        this.student.modifyTime=new Date();
+                        this.updataStuentinfo("update");
+                    }
+                    else{
+                        this.student.createTime=new Date();
+                        this.updataStuentinfo("add");
+                    }
+                },
+				deleteStuentinfo:function(id){
+					var that= this;
+					$.ajax({
+						type:"post",
+						url:"http://106.13.79.146:10000/stu/delete",
+						data:{id:id},
+						dataType:"json",
+						success:function(data){
+							if(data.success){
+								that.getStudentInfos();
+							}
+							else{
+								alert(data.msg);
+							}
+						}
+					});
+                },
+                updataStuentinfo:function(actionName){
+                    var that = this;
+                    $.ajax({
+                        type:"post",
+                        url:"http://106.13.79.146:10000/stu/"+actionName,
+                        data:{
+                            id: that.student.id, name: that.student.name,
+                            no: that.student.no,password:that.student.password,
+                            moblie: that.student.moblie,
+                            email: that.student.email,age: that.student.age,
+                            address:that.student.address,
+                            sex: that.student.sex,classId:that.student.classId,
+                            createUserId: that.student.createUserId,
+                            createTime: that.student.createTime,
+                            modifyTime: that.student.modifyTime,
+                            status: that.student.status},
+                        dataType:"json",
+                        success:function(data){
+                            that.student={id: 0, name:'',
+                                no: '',password:'',
+                                moblie: '',
+                                email: '',age: '',
+                                address:'',
+                                sex: '',classId:'',
+                                createUserId: '',
+                                createTime: '',
+                                modifyTime: '',
+                                status: '未注册'};
+                            if(data.success){
+                                that.getStudentInfos();
+                                $('#edit').modal('hide');
+                            }
+                            else{
+                                alert(data.msg);
+                            }
+                        }
+                    });
+                },
+
+                logout:function(){
+                    var token=window.sessionStorage.getItem("token");
+                    $.ajax({
+                    type:"post",
+                    url:"http://106.13.79.146:10000/stu/checkToken",
+                    dataType:"json",
+                    data:{token:token},
+                    success:function (data){
+                    if (data.success) {
+                        sessionStorage.clear();
+                        alert("成功退出！");
+                        location.href="http://106.13.79.146:8080/stu/login";
+                    }
+                }
+            })
+        }
+			},
+			
+		});
+	</script>
+</html>

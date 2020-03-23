@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<!-- 代码告诉IE浏览器，IE8/9及以后的版本都会以最高版本IE来渲染页面 -->
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<!-- device-width确保网页能正确呈现在不同设备 -->
+	<!-- initial-scale=1确保网页加载时，以 1:1 的比例呈现，不会有任何的缩放 -->
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<!-- 上述3个meta标签*必须*放在最前面，任何其他内容都*必须*跟随其后！ -->
+	<title>学生信息管理系统--用户登录</title>
+	<!-- Bootstrap 核心 CSS 文件 -->
+	<link rel="stylesheet" href="/bootstrap-3.3.7/css/bootstrap.min.css" >
+	<!-- 自定义的样式 -->
+	<link rel="stylesheet" type="text/css" href="/css/style.css" />
+	<!-- jQuery (Bootstrap 的所有 JavaScript 插件都依赖 jQuery，所以必须放在前边) -->
+	<script src="/bootstrap-3.3.7/js/jquery-3.3.1.min.js"></script>
+	<!-- 最新的 Bootstrap 核心 JavaScript 文件 -->
+	<script src="/bootstrap-3.3.7/js/bootstrap.min.js"></script>
+	<script src="/vue/vue.js"></script>
+</head>
+<body>
+<div class="sucaihuo-container" id="stuLogin">
+	<div class="demo form-bg" style="padding: 150px 0;">
+		<div class="container">
+			<div class="row">
+				<div class="col-md-offset-3 col-md-6">
+					<div class="form-horizontal" method="post">
+						<span class="heading">用户登录</span>
+						<div class="form-group">
+							<input type="text" class="form-control" name="loginId" id="loginId" placeholder="请输入用户名">
+							<i class="glyphicon glyphicon-user"></i>
+						</div>
+						<div class="form-group help">
+							<input type="password" class="form-control" name="pwd" id="pwd" placeholder="请输入密码">
+							<i class="glyphicon glyphicon-lock"></i>
+						</div>
+						<div class="form-group">
+							<div class="main-checkbox">
+								<input type="checkbox" value="None" id="checkbox1" name="check"/>
+								<label for="checkbox1"></label>
+							</div>
+							<span class="text">Remember me</span>
+							<button type="button" class="btn btn-default" @click="dologin">Log in</button>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+<script>
+	$(function isLogin() {
+		var token=window.sessionStorage.getItem("token");
+		if(token!=null){
+			$.ajax({
+				type:"post",
+				url:"http://106.13.79.146:10000/stu/checkToken",
+				dataType:"json",
+				data:{token:token},
+				success:function (data) {
+					if (data.success) {
+						location.href="http://106.13.79.146:8080/stu/list";
+					}
+				}
+			});
+
+		}
+	});
+
+	new Vue({
+		el: '#stuLogin',
+		methods: {
+			dologin:function(){
+
+				var no=$("#loginId").val();
+				var pwd=$("#pwd").val();
+				$.ajax({
+					type:"post",
+					url:"http://106.13.79.146:10000/stu/login.do",
+					dataType:"json",
+					data:{no:no,pwd:pwd},
+					success:function (data) {
+						if (data.success) {
+							window.sessionStorage.setItem("token",data.token);
+							location.href="http://106.13.79.146:8080/stu/list";
+						}
+						else {
+							alert(data.msg);
+							location.href="http://106.13.79.146:8080/stu/login";
+						}
+					}
+				});
+			},
+		}
+	});
+</script>
+</body>
+</html>
